@@ -184,7 +184,7 @@
             <small>ระบบสารสนเทศทางวิทยาการระบาดและสาธารณสุข</small>
         </div>
         <div class="profile-container">
-            <!-- ใส่ URL รูปภาพโปรไฟล์ของคุณจาก GitHub Raw URL -->
+            <!-- ใส่ URL รูปภาพโปรไฟล์จาก GitHub Raw URL -->
             <img src="https://raw.githubusercontent.com/67202302051-debug/final69-COVID-19/main/S__2662403.jpg" alt="Profile" class="profile-img" id="profile-img">
             <div>
                 <div style="font-weight: bold;">นักวิชาการสาธารณสุข</div>
@@ -284,7 +284,7 @@
     <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
 
     <script>
-        // ลิงก์ข้อมูล Google Sheet CSV ตัวใหม่
+        // ลิงก์ข้อมูล Google Sheet CSV 
         const GOOGLE_SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSE-WTMDJ7cOQD_mHFmTom62H55d3VUDWmJXyl-GHYusS95izK--TZ2XFrUdfMSr5j7mvjneOKqZuRT/pub?output=csv';
 
         const PROVINCE_COORDINATES = {
@@ -404,6 +404,10 @@
             if (mapType === 'spot') {
                 filteredData.forEach(d => {
                     const prov = d.province || d.province_of_isolation || d.จังหวัด || d.จังหวัดที่รักษา;
+                    
+                    // ดึงค่าอำเภอจากคอลัมน์ district_of_onset เป็นหลัก
+                    const district = d.district_of_onset || d.district || d.district_of_isolation || d.อำเภอ || 'ไม่ระบุ';
+                    
                     let lat = parseFloat(d.latitude || d.lat);
                     let lng = parseFloat(d.longitude || d.lon || d.lng);
 
@@ -421,7 +425,14 @@
                             opacity: 1,
                             fillOpacity: 0.7
                         });
-                        marker.bindPopup(`<b>จังหวัด:</b> ${prov || 'ไม่ระบุ'}<br><b>อำเภอ:</b> ${d.district || d.district_of_isolation || d.อำเภอ || '-'}<br><b>เพศ:</b> ${d.sex || d.เพศ || '-'}<br><b>อายุ:</b> ${d.age || d.อายุ || '-'} ปี`);
+                        
+                        // แสดงชื่ออำเภอจาก district_of_onset ใน Popup
+                        marker.bindPopup(`
+                            <b>จังหวัด:</b> ${prov || 'ไม่ระบุ'}<br>
+                            <b>อำเภอ (onset):</b> ${district}<br>
+                            <b>เพศ:</b> ${d.sex || d.เพศ || '-'}<br>
+                            <b>อายุ:</b> ${d.age || d.อายุ || '-'} ปี
+                        `);
                         markersGroup.addLayer(marker);
                     }
                 });
